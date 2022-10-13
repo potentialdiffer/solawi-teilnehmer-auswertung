@@ -1,6 +1,6 @@
 # Teilnehmeranalyse
 
-Dieses Skript erstellt eine Teilnehmeranalyse aus exportierten `.csv` Dateien von S-Verein.
+Dieses Skript erstellt eine Teilnehmeranalyse aus exportierten `.csv` Dateien von S-Verein. In einem Unterordner mit dem jeweiligen Ausführdatum werden außerden die Teilnehmer und Emaillisten der jeweiligen Abteilungen generiert.
 
 ## Requirements
 
