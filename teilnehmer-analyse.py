@@ -104,13 +104,7 @@ class DataEvaluation:
             if (t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Eier' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Käse' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Brot'):
                 t_abteilungen.loc[i, 'Abteilungsaustritt'] = self.stichtag
 
-        # Suche alle Teilnehmer, wie viele davon Winter / Sommer / etc und wie viele Anteile
         sommer = t_abteilungen.loc[
-            (t_abteilungen['Abteilungsbezeichnung'] == 'Sommer') &
-            (t_abteilungen['Abteilungsaustritt'] >= date_sommer) &
-            (t_abteilungen['Beitragsaustritt'] >= date_sommer)
-            ]
-        sommer_stichtag = t_abteilungen.loc[
             (t_abteilungen['Abteilungsbezeichnung'] == 'Sommer') &
             (t_abteilungen['Abteilungsaustritt'] >= self.stichtag) &
             (t_abteilungen['Beitragsaustritt'] >= self.stichtag)
@@ -121,13 +115,7 @@ class DataEvaluation:
             (t_abteilungen['Beitragsaustritt'] < self.stichtag)
             ]
 
-
         winter = t_abteilungen.loc[
-            (t_abteilungen['Abteilungsbezeichnung'] == 'Winter') &
-            (t_abteilungen['Abteilungsaustritt'] >= date_winter) &
-            (t_abteilungen['Beitragsaustritt'] >= date_winter)
-            ]
-        winter_stichtag = t_abteilungen.loc[
             (t_abteilungen['Abteilungsbezeichnung'] == 'Winter') &
             (t_abteilungen['Abteilungsaustritt'] >= self.stichtag) &
             (t_abteilungen['Beitragsaustritt'] >= self.stichtag)
@@ -135,9 +123,7 @@ class DataEvaluation:
         winter_ausgetreten = t_abteilungen.loc[
             (t_abteilungen['Abteilungsbezeichnung'] == 'Winter') &
             (t_abteilungen['Abteilungsaustritt'] < self.stichtag) &
-            # (t_abteilungen['Abteilungsaustritt'] > date(year=2021, month=10, day=1)) &
             (t_abteilungen['Beitragsaustritt'] < self.stichtag)
-            # (t_abteilungen['Beitragsaustritt'] > date(year=2021, month=10, day=1))
             ]
 
         eier = t_abteilungen.loc[
@@ -223,14 +209,6 @@ class DataEvaluation:
                     drop(self.teilnehmer_data["ausgetretene_mitglieder"]. \
                      loc[self.teilnehmer_data["ausgetretene_mitglieder"].index == i].index, inplace=True)
             if not (winter.loc[(winter['Mitglieds-Nr'] == number)]).empty:
-                self.teilnehmer_data["ausgetretene_mitglieder"]. \
-                    drop(self.teilnehmer_data["ausgetretene_mitglieder"]. \
-                     loc[self.teilnehmer_data["ausgetretene_mitglieder"].index == i].index, inplace=True)
-            if not (sommer_stichtag.loc[(sommer_stichtag['Mitglieds-Nr'] == number)]).empty:
-                self.teilnehmer_data["ausgetretene_mitglieder"]. \
-                    drop(self.teilnehmer_data["ausgetretene_mitglieder"]. \
-                     loc[self.teilnehmer_data["ausgetretene_mitglieder"].index == i].index, inplace=True)
-            if not (winter_stichtag.loc[(winter_stichtag['Mitglieds-Nr'] == number)]).empty:
                 self.teilnehmer_data["ausgetretene_mitglieder"]. \
                     drop(self.teilnehmer_data["ausgetretene_mitglieder"]. \
                      loc[self.teilnehmer_data["ausgetretene_mitglieder"].index == i].index, inplace=True)
