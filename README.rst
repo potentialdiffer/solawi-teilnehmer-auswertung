@@ -33,11 +33,47 @@
 solawi-teilnehmer-auswertung
 ============================
 
+    Teilnehmeranalyse für aus S-Verein exportierte Daten.
 
-    Add a short description here!
 
 
-A longer description of your project goes here...
+Instasllation
+=============
+
+```
+$ git clone https://github.com/potentialdiffer/solawi-teilnehmer-auswertung
+$ cd solawi-teilnehmer-auswertung
+$ pip install .
+```
+
+Usage
+=====
+
+1. Folgende zwei listen aus S-Verein exportieren:
+    - Export-Skript (ist die abteilungsliste)
+    - Übersicht (ist die teilnehmerliste)
+2. Die Listen in diesen Ordner laden
+3. Ausführen des Skripts mit zwei Parametern:
+    - `abteilungen.csv`
+    - `mitglieder.csv`
+    - `output-markdown-path`: Name der output Datei. Sie ist mit Markdown formatiert. Kann z.b. README.md oder HEADER.md heißen, dann wird sie direkt in Nextcloud gerendert.
+
+```
+$ python teilnehmer-analyse.py <abteilungen.csv> <mitglieder.csv> <output-bericht-path> <stichtag [dd-mm-yyyy]> <--plot [true, false]>
+```
+
+- `stichtag`: ist das Datum zu welchem Zeitpunkt die Teilnehmerzahl bestimmt werden soll.
+- `plot`: erzeugt Graphen mit den Teilnehmerzahlen üer die vergangenen Jahre. Kann im Code weiter Konfiguriert werden.
+
+TODO
+====
+
+Gemüse und andere Listen erstellen
+- (Adressen exportieren) PLZ und Ort
+- Anteile
+- (Telefon)
+- Nach "Zugehörigkeit" Filtern
+- Person hat keine Email hinterlegt. Wie verfährt man damit?
 
 
 .. _pyscaffold-notes:
