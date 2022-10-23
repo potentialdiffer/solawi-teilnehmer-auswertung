@@ -37,7 +37,7 @@ solawi-teilnehmer-auswertung
 
 
 
-Instasllation
+Installation
 =============
 
 ```
@@ -49,7 +49,7 @@ $ pip install .
 Usage
 =====
 
-1. Folgende zwei listen aus S-Verein exportieren:
+1. Folgende zwei Listen aus S-Verein exportieren:
     - Export-Skript (ist die abteilungsliste)
     - Übersicht (ist die teilnehmerliste)
 2. Die Listen in diesen Ordner laden
@@ -63,7 +63,7 @@ $ python teilnehmer-analyse.py <abteilungen.csv> <mitglieder.csv> <output-berich
 ```
 
 - `stichtag`: ist das Datum zu welchem Zeitpunkt die Teilnehmerzahl bestimmt werden soll.
-- `plot`: erzeugt Graphen mit den Teilnehmerzahlen üer die vergangenen Jahre. Kann im Code weiter Konfiguriert werden.
+- **legacy** `plot`: erzeugt Graphen mit den Teilnehmerzahlen üer die vergangenen Jahre. Kann im Code weiter Konfiguriert werden.
 
 TODO
 ====
