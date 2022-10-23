@@ -51,7 +51,7 @@ class Teilnehmer:
                 self.add_membership(
                     abteilungen['Abteilungsbezeichnung'][idx],
                     abteilungen['Abteilungseintritt'][idx],
-                    abteilungen['Abteilungsaustritt'][idx],
+                    abteilungen['Beitragsaustritt'][idx],
                     abteilungen['Beitragsbezeichnung'][idx],
                 )
 

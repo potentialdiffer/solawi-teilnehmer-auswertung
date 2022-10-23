@@ -119,7 +119,12 @@ class DataEvaluation:
             'Abteilungseintritt',
             'Abteilungsaustritt', 
             'Beitragsaustritt'])
-        t_mitglieder = table_mitglieder.filter(items=['Mitglieds-Nr', 'E-Mail', 'Nachname', 'Vorname', 'PLZ'])
+        t_mitglieder = table_mitglieder.filter(items=
+            ['Mitglieds-Nr',
+            'E-Mail',
+            'Nachname',
+            'Vorname',
+            'PLZ'])
 
         # filter die Beitragsbezeichnungen
         beitragsbez = t_abteilungen['Beitragsbezeichnung'].unique()
@@ -150,9 +155,6 @@ class DataEvaluation:
             else:
                 t_abteilungen.loc[i, 'Abteilungsaustritt'] = date_winter if t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Winter' else date_sommer
 
-            # other cooperations usually have no exit date. Simply set to today.
-            if (t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Eier' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Käse' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Brot'):
-                t_abteilungen.loc[i, 'Abteilungsaustritt'] = self.stichtag
 
         for i, d in enumerate(t_abteilungen['Beitragsaustritt']):
             if not isinstance(d, float):
@@ -162,9 +164,6 @@ class DataEvaluation:
             else:
                 t_abteilungen.loc[i, 'Beitragsaustritt'] = date_winter if t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Winter' else date_sommer
 
-            # other cooperations usually have no exit date. Simply set to today.
-            if (t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Eier' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Käse' or t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Brot'):
-                t_abteilungen.loc[i, 'Abteilungsaustritt'] = self.stichtag
 
 
         # derive dataclass and create dataframe
@@ -243,11 +242,11 @@ class DataEvaluation:
             f.write(f'Stichtag: {self.stichtag}\n\n')
             f.write('| Bezeichnung | Teilnehmer | Anteile | \n')
             f.write('| --- | --- | --- | \n')
-            f.write(('| Sommer | %i | %f | \n') % (self.get_amount_of_membership(MembershipType.SOMMER)))
-            f.write(('| Winter | %i | %f | \n') % (self.get_amount_of_membership(MembershipType.WINTER)))
-            f.write(('| Eier | %i | %f | \n') % (self.get_amount_of_membership(MembershipType.EIER)))
-            f.write(('| Käse | %i | %f | \n') % (self.get_amount_of_membership(MembershipType.KASE)))
-            f.write(('| Brot | %i | %f | \n') % (self.get_amount_of_membership(MembershipType.BROT)))
+            f.write(('| Sommer | %i | %i | \n') % (self.get_amount_of_membership(MembershipType.SOMMER)))
+            f.write(('| Winter | %i | %i | \n') % (self.get_amount_of_membership(MembershipType.WINTER)))
+            f.write(('| Eier | %i | %i | \n') % (self.get_amount_of_membership(MembershipType.EIER)))
+            f.write(('| Käse | %i | %i | \n') % (self.get_amount_of_membership(MembershipType.KASE)))
+            f.write(('| Brot | %i | %i | \n') % (self.get_amount_of_membership(MembershipType.BROT)))
             f.write(('\n'))
             f.write('## Aktualisieren der aktuellen Teilnehmerdaten\n\n')
             f.write(('Die Tabelle mit den Teilnehmerzahlen und den Anteilen wird in etwa jede Stunde von der Datei `.s-verein-export.csv` erstellt. Sie kann nicht manuell erstellt werden. Die `csv` Datei ist ein Export der S-Verein Liste *Gesamt-Skript*.\n'))
