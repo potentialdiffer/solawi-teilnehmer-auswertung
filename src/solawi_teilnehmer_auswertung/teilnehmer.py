@@ -10,7 +10,6 @@ import numpy as np
 from logging import DEBUG, getLogger, StreamHandler
 
 
-
 logger = getLogger("topic_cluster")
 
 class MembershipType(Enum):

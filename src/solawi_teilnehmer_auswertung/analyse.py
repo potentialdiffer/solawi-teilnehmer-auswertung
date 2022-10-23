@@ -9,11 +9,11 @@ from datetime import datetime
 from dateutil.parser import parse
 import argparse
 import matplotlib.pyplot as plt
-from typing import List
+from typing import List, Tuple
 
 
 
-from teilnehmer import Teilnehmer, Membership, MembershipType
+from solawi_teilnehmer_auswertung.teilnehmer import Teilnehmer, MembershipType
 
 
 logger = getLogger("topic_cluster")
@@ -140,6 +140,7 @@ class DataEvaluation:
             t_mitglieder.loc[i, 'Mitglieds-Nr'] = number[0]
 
         t_mitglieder['Mitglieds-Nr'] = t_mitglieder['Mitglieds-Nr'].astype(int)
+        
         # convert string to datetime
         for i, d in enumerate(t_abteilungen['Abteilungsaustritt']):
             if not isinstance(d, float):
@@ -253,7 +254,7 @@ class DataEvaluation:
             f.write(('Um die Daten zu aktualisieren muss:\n\n1. Ein Export der Liste in S-Verein erstellt werden\n2. Die Liste muss in `.s-verein-export.csv` umbenannt werden\n3. Die umbenannte Liste muss in diesen Ordner geladen werden\n\n'))
 
 
-    def get_amount_of_membership(self, mt: MembershipType) -> (int, float):
+    def get_amount_of_membership(self, mt: MembershipType) -> Tuple[int, float]:
         """
         for type t on date d
         """
@@ -300,6 +301,7 @@ def plot_analysis() -> None:
     winter = []
     for d in dates:
         deval = DataEvaluation(in_abteilungen_file, in_mitglieder_file, out_file, d)
+        deval.set_stichtag(d)
         sommer.append(deval.teilnehmer_data["s_anteile"])
         winter.append(deval.teilnehmer_data["w_anteile"])
 

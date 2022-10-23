@@ -25,7 +25,7 @@ import logging
 import sys
 
 from solawi_teilnehmer_auswertung import __version__
-from analyse import main as start_teilnehmer_analyse
+from solawi_teilnehmer_auswertung.analyse import main as start_teilnehmer_analyse
 
 __author__ = "Christian Spinnler"
 __copyright__ = "Christian Spinnler"
