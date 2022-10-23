@@ -9,8 +9,11 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["abteilungen.csv",
-                "teilnehmer.csv", "output.md", "2022-11-01"],
+            "args": [
+                "abteilungen.csv",
+                "teilnehmer.csv", 
+                "output.md", 
+                "2022-11-01"],
             "console": "integratedTerminal",
             "justMyCode": true
         },
