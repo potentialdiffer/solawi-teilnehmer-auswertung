@@ -314,7 +314,7 @@ class DataEvaluation:
 
         for l in left:
             if l not in right:
-                new_left.extend(l)
+                new_left.append(l)
 
         if sorted:
             new_left.sort()
