@@ -13,6 +13,20 @@
                 "teilnehmer.csv", "output.md", "2022-11-01"],
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python Module",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/src/solawi_teilnehmer_auswertung/skeleton.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceRoot}",
+            "args": [
+                "abteilungen.csv",
+                "teilnehmer.csv",
+                "output.md",
+                "2022-11-01"
+            ],
         }
     ]
 }
