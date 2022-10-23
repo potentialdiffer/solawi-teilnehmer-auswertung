@@ -5,32 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Aktuelle Datei",
+            "name": "Python-Modul",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "args": [
-                "abteilungen.csv",
-                "teilnehmer.csv", 
-                "output.md", 
-                "2022-11-01"],
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Python Module",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/src/solawi_teilnehmer_auswertung/skeleton.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceRoot}",
+            "module": "solawi_teilnehmer_auswertung",
+            "justMyCode": false,
+            "stopOnEntry": true,
             "args": [
                 "abteilungen.csv",
                 "teilnehmer.csv",
                 "output.md",
                 "2022-11-01"
             ],
+        },
+        {
+            "name": "Python: Aktuelle Datei",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "abteilungen.csv",
+                "teilnehmer.csv",
+                "output.md",
+                "2022-11-01"
+            ],
+            "console": "integratedTerminal",
             "justMyCode": false
-        }
+        },
     ]
 }

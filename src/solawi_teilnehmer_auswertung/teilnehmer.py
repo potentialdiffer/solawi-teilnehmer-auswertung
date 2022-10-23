@@ -51,9 +51,14 @@ class Teilnehmer:
                 self.add_membership(
                     abteilungen['Abteilungsbezeichnung'][idx],
                     abteilungen['Abteilungseintritt'][idx],
-                    abteilungen['Beitragsaustritt'][idx],
+                    self.get_earlier_date(
+                        abteilungen['Beitragsaustritt'][idx], 
+                        abteilungen['Abteilungsaustritt'][idx]),
                     abteilungen['Beitragsbezeichnung'][idx],
                 )
+
+    def get_earlier_date(self, a, b) -> date:
+        return a if a < b else b
 
 
     def add_membership(self, membership_type: MembershipType, start: date, end: date, amount: int) -> None:

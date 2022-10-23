@@ -73,8 +73,8 @@ class DataEvaluation:
 
         self.write_mail_to_file(mails_all, '/mails_all.txt', today_str)
         self.write_mail_to_file(mail_left, '/ausgetretene_mitglieder.txt', today_str)
-        self.write_mail_to_file(mails_sommer, '/winter-mail.txt', today_str)
-        self.write_mail_to_file(mails_winter, '/sommer-mail.txt', today_str)
+        self.write_mail_to_file(mails_winter, '/winter-mail.txt', today_str)
+        self.write_mail_to_file(mails_sommer, '/sommer-mail.txt', today_str)
         self.write_mail_to_file(mails_eier, '/eier-mail.txt', today_str)
         self.write_mail_to_file(mails_kase, '/kase-mail.txt', today_str)
         self.write_mail_to_file(mails_brot, '/brot-mail.txt', today_str)
@@ -272,7 +272,7 @@ class DataEvaluation:
 
         return (teilnehmer, amount)
 
-    def get_mails_of_memberships(self, mt: List[MembershipType]) -> List[str]:
+    def get_mails_of_memberships(self, mt: List[MembershipType], sorted=False) -> List[str]:
 
         mails = list()
         for member in self.teilnehmer_data:
@@ -282,11 +282,12 @@ class DataEvaluation:
                         if member.mails is not None :
                             mails.extend(member.mails)
                         break
-
+        if sorted:
+            mails.sort()
         return mails
 
 
-    def get_left_solawis(self) -> List[str]:
+    def get_left_solawis(self, sorted=False) -> List[str]:
 
         mails = list()
         for member in self.teilnehmer_data:
@@ -300,10 +301,11 @@ class DataEvaluation:
             if left and member.mails is not None:
                 mails.extend(member.mails)
 
-        # mails = mails.sort()
+        if sorted:
+            mails.sort()
         return mails
 
-    def clean_left_list(self, left: List[str], right: List[str]) -> List[str]:
+    def clean_left_list(self, left: List[str], right: List[str], sorted=False) -> List[str]:
         """
         merge right list in left list
         """
@@ -314,7 +316,8 @@ class DataEvaluation:
             if l not in right:
                 new_left.extend(l)
 
-        print(new_left)
+        if sorted:
+            new_left.sort()
         return new_left
 
 
@@ -381,25 +384,9 @@ def main(
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Solawi Teilnehmerauswertung von SVerein Export')
-    parser.add_argument('abteilungen', metavar='Abteilugstabelle', type=str,
-                        help='Pfad zur Abteilungs CSV-Datei')
-    parser.add_argument('teilnehmer', metavar='Teilnehmertabelle', type=str,
-                        help='Pfad zur Teilnehmer CSV-Datei')
-    parser.add_argument('bericht', metavar='Pfad zum Bericht', type=str,
-                        help='Pfad zum erzeugtem Bericht')
-    parser.add_argument('stichtag', metavar='Stichtag', type=str,
-                        help='Datum, zu welchem der Bericht erzeugt werden soll im Format: yyyy-mm-dd')
-    parser.add_argument('--plot', metavar='Plot', type=bool, default=False,
-                        help='Option, um die Ernteanteile über die Zeit zu plotten [true, false]')
-
-
-    args = parser.parse_args()
-
-    out_file = args.bericht
-    in_mitglieder_file = args.teilnehmer
-    in_abteilungen_file = args.abteilungen
-    stichtag = args.stichtag
-    d = DataEvaluation(in_abteilungen_file, in_mitglieder_file, out_file, stichtag)
-    d.write_amout_data_to_file(out_file)
+    out_file = "output.md"
+    in_mitglieder_file = "teilnehmer.csv"
+    in_abteilungen_file = "abteilungen.csv"
+    stichtag = "2022-11-01"
+    main(in_abteilungen_file, in_mitglieder_file, out_file, stichtag)
     logger.info("Exit with Success!")
