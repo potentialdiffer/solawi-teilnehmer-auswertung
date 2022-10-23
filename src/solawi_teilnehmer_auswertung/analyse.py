@@ -68,8 +68,11 @@ class DataEvaluation:
         mails_eier = self.get_mails_of_memberships([MembershipType.EIER])
         mails_kase = self.get_mails_of_memberships([MembershipType.KASE])
 
+        mail_left = self.get_left_solawis()
+        mail_left = self.clean_left_list(mail_left, mails_all)
+
         self.write_mail_to_file(mails_all, '/mails_all.txt', today_str)
-        #self.write_mail_to_file(mail_winter, '/ausgetretene_mitglieder.txt', today_str)
+        self.write_mail_to_file(mail_left, '/ausgetretene_mitglieder.txt', today_str)
         self.write_mail_to_file(mails_sommer, '/winter-mail.txt', today_str)
         self.write_mail_to_file(mails_winter, '/sommer-mail.txt', today_str)
         self.write_mail_to_file(mails_eier, '/eier-mail.txt', today_str)
@@ -281,6 +284,40 @@ class DataEvaluation:
                         break
 
         return mails
+
+
+    def get_left_solawis(self) -> List[str]:
+
+        mails = list()
+        for member in self.teilnehmer_data:
+            left = False
+            for membership in member.memberships:
+                if membership.end <= self.stichtag:
+                    left = True
+                else:
+                    left = False
+
+            if left and member.mails is not None:
+                mails.extend(member.mails)
+
+        # mails = mails.sort()
+        return mails
+
+    def clean_left_list(self, left: List[str], right: List[str]) -> List[str]:
+        """
+        merge right list in left list
+        """
+
+        new_left = list()
+
+        for l in left:
+            if l not in right:
+                new_left.extend(l)
+
+        print(new_left)
+        return new_left
+
+
 
 def plot_analysis() -> None:
     dates = ['2018-05-01',
