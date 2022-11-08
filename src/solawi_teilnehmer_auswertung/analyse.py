@@ -329,25 +329,33 @@ class DataEvaluation:
         for d in dates:
             self.set_stichtag(d)
 
-            sommer_teilnehmer = (self.get_amount_of_membership(MembershipType.SOMMER)[0])
-            sommer_anteile = (self.get_amount_of_membership(MembershipType.SOMMER)[1])
-            winter_teilnehmer = (self.get_amount_of_membership(MembershipType.WINTER)[0])
-            winter_anteile = (self.get_amount_of_membership(MembershipType.WINTER)[1])
-
-            sommer_teilnehmer = { 'date': d, 'type': 'Sommer Teilnehmer', 'amount': sommer_teilnehmer }
-            sommer_anteile = { 'date': d, 'type': 'Sommer Anteile', 'amount': sommer_anteile }
-            winter_teilnehmer = { 'date': d, 'type': 'Winter Teilnehmer', 'amount': winter_teilnehmer }
-            winter_anteile = { 'date': d, 'type': 'Winter Anteile', 'amount': winter_anteile }
-            
+            sommer_teilnehmer = (
+                self.get_amount_of_membership(MembershipType.SOMMER)[0])
+            sommer_anteile = (
+                self.get_amount_of_membership(MembershipType.SOMMER)[1])
+            sommer_teilnehmer = {'date': d, 'saison': 'Sommer',
+                                 'type': 'Teilnehmer', 'amount': sommer_teilnehmer}
+            sommer_anteile = {'date': d, 'saison': 'Sommer',
+                              'type': 'Anteile', 'amount': sommer_anteile}
             data.append(sommer_teilnehmer)
             data.append(sommer_anteile)
+
+
+            winter_teilnehmer = (
+                self.get_amount_of_membership(MembershipType.WINTER)[0])
+            winter_anteile = (
+                self.get_amount_of_membership(MembershipType.WINTER)[1])
+            winter_teilnehmer = {'date': d, 'saison': 'Winter',
+                                 'type': 'Teilnehmer', 'amount': winter_teilnehmer}
+            winter_anteile = {'date': d, 'saison': 'Winter',
+                              'type': 'Anteile', 'amount': winter_anteile}
             data.append(winter_teilnehmer)
             data.append(winter_anteile)
 
         data = pd.DataFrame.from_dict(data)
 
         sns.set()
-        res = sns.lineplot(data=data, x='date', y='amount', hue='type')
+        res = sns.lineplot(data=data, x='date', y='amount', hue='saison', style='type')
         plt.xticks(rotation=45)
         plt.show()
 
