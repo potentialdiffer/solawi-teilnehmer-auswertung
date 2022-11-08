@@ -92,8 +92,7 @@ def parse_args(args):
         help='Datum, zu welchem der Bericht erzeugt werden soll im Format: yyyy-mm-dd')
 
     parser.add_argument('--plot',
-        type=bool,
-        default=False,
+        action='store_true',
         help='Option, um die Ernteanteile über die Zeit zu plotten [true, false]')
 
 

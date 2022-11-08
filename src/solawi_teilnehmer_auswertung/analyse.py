@@ -322,38 +322,32 @@ class DataEvaluation:
 
 
 
-def plot_analysis() -> None:
-    dates = ['2018-05-01',
-            '2018-11-01',
-            '2019-05-01',
-            '2019-11-01',
-            '2020-05-01',
-            '2020-11-01',
-            '2021-05-01',
-            '2021-11-01',
-            '2022-05-01',
-            '2022-11-01',
-            '2023-05-01',
-            '2023-11-01']
+    def plot_analysis(self, dates: List[str]) -> None:
 
-    sommer = []
-    winter = []
-    for d in dates:
-        deval = DataEvaluation(in_abteilungen_file, in_mitglieder_file, out_file, d)
-        deval.set_stichtag(d)
-        sommer.append(deval.teilnehmer_data["s_anteile"])
-        winter.append(deval.teilnehmer_data["w_anteile"])
+        sommer_teilnehmer = []
+        sommer_anteile = []
+        winter_teilnehmer = []
+        winter_anteile = []
 
-    fig, ax = plt.subplots()
-    ax.plot(dates, sommer, label='Sommer Anteile')
-    ax.plot(dates, winter, label='Winter Anteile')
+        for d in dates:
+            self.set_stichtag(d)
+            sommer_teilnehmer.append(self.get_amount_of_membership(MembershipType.SOMMER)[0])
+            sommer_anteile.append(self.get_amount_of_membership(MembershipType.SOMMER)[1])
+            winter_teilnehmer.append(self.get_amount_of_membership(MembershipType.WINTER)[0])
+            winter_anteile.append(self.get_amount_of_membership(MembershipType.WINTER)[1])
 
-    ax.set_xlabel("Datum")
-    ax.set_ylabel("Anteile")
-    ax.legend()
-    plt.xticks(rotation=45)
-    plt.grid()
-    plt.show()
+        _fig, ax = plt.subplots()
+        ax.plot(dates, sommer_teilnehmer, label='Sommer Teilnehmer')
+        ax.plot(dates, sommer_anteile, label='Sommer Anteile')
+        ax.plot(dates, winter_teilnehmer, label='Winter Teilnehmer')
+        ax.plot(dates, winter_anteile, label='Winter Anteile')
+
+        ax.set_xlabel("Datum")
+        ax.set_ylabel("Anzahl")
+        ax.legend()
+        plt.xticks(rotation=45)
+        plt.grid()
+        plt.show()
 
 
 def main(
@@ -377,7 +371,20 @@ def main(
     d.write_mailing_lists_to_file()
 
     if plot:
-        plot_analysis()
+        dates = ['2018-05-01',
+                '2018-11-01',
+                '2019-05-01',
+                '2019-11-01',
+                '2020-05-01',
+                '2020-11-01',
+                '2021-05-01',
+                '2021-11-01',
+                '2022-05-01',
+                '2022-11-01',
+                '2023-05-01',
+                '2023-11-01']
+
+        d.plot_analysis(dates)
 
 
 
