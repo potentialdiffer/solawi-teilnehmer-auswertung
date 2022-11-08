@@ -10,7 +10,7 @@ from dateutil.parser import parse
 import argparse
 import matplotlib.pyplot as plt
 from typing import List, Tuple
-
+import seaborn as sns
 
 
 from solawi_teilnehmer_auswertung.teilnehmer import Teilnehmer, MembershipType
@@ -175,7 +175,7 @@ class DataEvaluation:
 
         for idx in t_mitglieder.index:
 
-            # Get mail addresses from datapoint
+            # Get mail addressns from datapoint
             mails = t_mitglieder['E-Mail'][idx]
             # create new dataclass instance for each teilnehmer
             t = Teilnehmer(
@@ -324,29 +324,31 @@ class DataEvaluation:
 
     def plot_analysis(self, dates: List[str]) -> None:
 
-        sommer_teilnehmer = []
-        sommer_anteile = []
-        winter_teilnehmer = []
-        winter_anteile = []
+        data = []
 
         for d in dates:
             self.set_stichtag(d)
-            sommer_teilnehmer.append(self.get_amount_of_membership(MembershipType.SOMMER)[0])
-            sommer_anteile.append(self.get_amount_of_membership(MembershipType.SOMMER)[1])
-            winter_teilnehmer.append(self.get_amount_of_membership(MembershipType.WINTER)[0])
-            winter_anteile.append(self.get_amount_of_membership(MembershipType.WINTER)[1])
 
-        _fig, ax = plt.subplots()
-        ax.plot(dates, sommer_teilnehmer, label='Sommer Teilnehmer')
-        ax.plot(dates, sommer_anteile, label='Sommer Anteile')
-        ax.plot(dates, winter_teilnehmer, label='Winter Teilnehmer')
-        ax.plot(dates, winter_anteile, label='Winter Anteile')
+            sommer_teilnehmer = (self.get_amount_of_membership(MembershipType.SOMMER)[0])
+            sommer_anteile = (self.get_amount_of_membership(MembershipType.SOMMER)[1])
+            winter_teilnehmer = (self.get_amount_of_membership(MembershipType.WINTER)[0])
+            winter_anteile = (self.get_amount_of_membership(MembershipType.WINTER)[1])
 
-        ax.set_xlabel("Datum")
-        ax.set_ylabel("Anzahl")
-        ax.legend()
+            sommer_teilnehmer = { 'date': d, 'type': 'Sommer Teilnehmer', 'amount': sommer_teilnehmer }
+            sommer_anteile = { 'date': d, 'type': 'Sommer Anteile', 'amount': sommer_anteile }
+            winter_teilnehmer = { 'date': d, 'type': 'Winter Teilnehmer', 'amount': winter_teilnehmer }
+            winter_anteile = { 'date': d, 'type': 'Winter Anteile', 'amount': winter_anteile }
+            
+            data.append(sommer_teilnehmer)
+            data.append(sommer_anteile)
+            data.append(winter_teilnehmer)
+            data.append(winter_anteile)
+
+        data = pd.DataFrame.from_dict(data)
+
+        sns.set()
+        res = sns.lineplot(data=data, x='date', y='amount', hue='type')
         plt.xticks(rotation=45)
-        plt.grid()
         plt.show()
 
 
@@ -395,5 +397,5 @@ if __name__ == "__main__":
     in_mitglieder_file = "teilnehmer.csv"
     in_abteilungen_file = "abteilungen.csv"
     stichtag = "2022-11-01"
-    main(in_abteilungen_file, in_mitglieder_file, out_file, stichtag)
+    main(in_abteilungen_file, in_mitglieder_file, out_file, stichtag, plot=True)
     logger.info("Exit with Success!")
