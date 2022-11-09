@@ -272,6 +272,7 @@ class DataEvaluation:
 
         return (teilnehmer, amount)
 
+
     def get_mails_of_memberships(self, mt: List[MembershipType], sorted=False) -> List[str]:
 
         mails = list()
@@ -305,6 +306,7 @@ class DataEvaluation:
             mails.sort()
         return mails
 
+
     def clean_left_list(self, left: List[str], right: List[str], sorted=False) -> List[str]:
         """
         merge right list in left list
@@ -318,44 +320,110 @@ class DataEvaluation:
 
         if sorted:
             new_left.sort()
-        return new_left
 
+        return new_left
 
 
     def plot_analysis(self, dates: List[str]) -> None:
 
         data = []
 
+        sommer_teilnehmer_prev = 0
+        sommer_anteile_prev = 0.0
+        winter_teilnehmer_prev = 0
+        winter_anteile_prev = 0.0
+
         for d in dates:
             self.set_stichtag(d)
 
             sommer_teilnehmer = (
                 self.get_amount_of_membership(MembershipType.SOMMER)[0])
+            sommer_teilnehmer_delta = (
+                self.get_amount_of_membership(MembershipType.SOMMER)[0])
             sommer_anteile = (
                 self.get_amount_of_membership(MembershipType.SOMMER)[1])
-            sommer_teilnehmer = {'date': d, 'saison': 'Sommer',
-                                 'type': 'Teilnehmer', 'amount': sommer_teilnehmer}
-            sommer_anteile = {'date': d, 'saison': 'Sommer',
-                              'type': 'Anteile', 'amount': sommer_anteile}
-            data.append(sommer_teilnehmer)
-            data.append(sommer_anteile)
+            sommer_anteile_delta = (
+                self.get_amount_of_membership(MembershipType.SOMMER)[1])
 
+            sommer_teilnehmer_dict = {
+                'date': d,
+                'saison': 'Sommer',
+                'type': 'Teilnehmer',
+                'amount': sommer_teilnehmer,
+                }
+            sommer_anteile_dict = {
+                'date': d,
+                'saison': 'Sommer',
+                'type': 'Anteile',
+                'amount': sommer_anteile,
+                }
+            sommer_teilnehmer_delta_dict = {
+                'date': d,
+                'saison': 'Sommer',
+                'type': 'Teilnehmer Delta',
+                'amount': sommer_teilnehmer - sommer_teilnehmer_prev
+                }
+            sommer_anteile_delta_dict = {
+                'date': d,
+                'saison': 'Sommer',
+                'type': 'Anteile Delta',
+                'amount': sommer_anteile - sommer_anteile_prev
+                }
+
+            data.append(sommer_teilnehmer_dict)
+            data.append(sommer_anteile_dict)
+            data.append(sommer_teilnehmer_delta_dict)
+            data.append(sommer_anteile_delta_dict)
+
+            sommer_teilnehmer_prev = sommer_teilnehmer
+            sommer_anteile_prev = sommer_anteile
 
             winter_teilnehmer = (
                 self.get_amount_of_membership(MembershipType.WINTER)[0])
             winter_anteile = (
                 self.get_amount_of_membership(MembershipType.WINTER)[1])
-            winter_teilnehmer = {'date': d, 'saison': 'Winter',
-                                 'type': 'Teilnehmer', 'amount': winter_teilnehmer}
-            winter_anteile = {'date': d, 'saison': 'Winter',
-                              'type': 'Anteile', 'amount': winter_anteile}
-            data.append(winter_teilnehmer)
-            data.append(winter_anteile)
+            winter_teilnehmer_dict = {
+                'date': d, 
+                'saison': 'Winter',
+                'type': 'Teilnehmer',
+                'amount': winter_teilnehmer,
+                }
+            winter_anteile_dict = {
+                'date': d,
+                'saison': 'Winter',
+                'type': 'Anteile',
+                'amount': winter_anteile,
+                }
+            winter_teilnehmer_delta_dict = {
+                'date': d, 
+                'saison': 'Winter',
+                'type': 'Teilnehmer Delta',
+                'amount': winter_teilnehmer - winter_teilnehmer_prev
+                }
+            winter_anteile_delta_dict = {
+                'date': d,
+                'saison': 'Winter',
+                'type': 'Anteile Delta',
+                'amount': winter_anteile - winter_anteile_prev
+                }
 
-        data = pd.DataFrame.from_dict(data)
+            data.append(winter_teilnehmer_dict)
+            data.append(winter_anteile_dict)
+            data.append(winter_teilnehmer_delta_dict)
+            data.append(winter_anteile_delta_dict)
+
+            winter_anteile_prev = winter_anteile
+            winter_teilnehmer_prev = winter_teilnehmer
+
+
+        data_delta = [d for d in data if (d['type'] == 'Anteile Delta' or d['type'] == 'Teilnehmer Delta')]
+        data_total = [d for d in data if (d['type'] == 'Anteile' or d['type'] == 'Teilnehmer')]
+        data_total = pd.DataFrame.from_dict(data_total)
+        data_delta = pd.DataFrame.from_dict(data_delta)
 
         sns.set()
-        res = sns.lineplot(data=data, x='date', y='amount', hue='saison', style='type')
+        res = sns.barplot(data=data_delta, x='date', y='amount', hue='saison')
+        res = sns.lineplot(data=data_total, x='date', y='amount', hue='saison', style='type')
         plt.xticks(rotation=45)
         plt.show()
 
