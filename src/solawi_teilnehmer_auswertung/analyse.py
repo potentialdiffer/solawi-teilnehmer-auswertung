@@ -27,6 +27,7 @@ class DataEvaluation:
     output_file = ""
     teilnehmer: List[Teilnehmer] = None
     stichtag: date = None
+    far_date: date = date(year=2050, month=1, day=1)
 
 
     def __init__(self, in_abteilungen_file, in_mitglieder_file, out_path, stichtag):
@@ -156,7 +157,7 @@ class DataEvaluation:
 
             # if no date is available, set date to start of next term
             else:
-                t_abteilungen.loc[i, 'Abteilungsaustritt'] = date_winter if t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Winter' else date_sommer
+                t_abteilungen.loc[i, 'Abteilungsaustritt'] = self.far_date
 
 
         for i, d in enumerate(t_abteilungen['Beitragsaustritt']):
@@ -165,7 +166,7 @@ class DataEvaluation:
 
             # if no date is available, set date to start of next term
             else:
-                t_abteilungen.loc[i, 'Beitragsaustritt'] = date_winter if t_abteilungen.loc[i, 'Abteilungsbezeichnung'] == 'Winter' else date_sommer
+                t_abteilungen.loc[i, 'Beitragsaustritt'] = self.far_date
 
 
 
@@ -338,11 +339,7 @@ class DataEvaluation:
 
             sommer_teilnehmer = (
                 self.get_amount_of_membership(MembershipType.SOMMER)[0])
-            sommer_teilnehmer_delta = (
-                self.get_amount_of_membership(MembershipType.SOMMER)[0])
             sommer_anteile = (
-                self.get_amount_of_membership(MembershipType.SOMMER)[1])
-            sommer_anteile_delta = (
                 self.get_amount_of_membership(MembershipType.SOMMER)[1])
 
             sommer_teilnehmer_dict = {
@@ -422,9 +419,13 @@ class DataEvaluation:
         data_delta = pd.DataFrame.from_dict(data_delta)
 
         sns.set()
-        res = sns.barplot(data=data_delta, x='date', y='amount', hue='saison')
-        res = sns.lineplot(data=data_total, x='date', y='amount', hue='saison', style='type')
+        ax = sns.barplot(data=data_delta, x='date', y='amount', hue='saison')
+        ax.bar_label(ax.containers[0])
+        ax.bar_label(ax.containers[1])
+
+        _res = sns.lineplot(data=data_total, x='date', y='amount', hue='saison', style='type')
         plt.xticks(rotation=45)
+
         plt.show()
 
 
