@@ -422,6 +422,7 @@ class DataEvaluation:
         ax = sns.barplot(data=data_delta, x='date', y='amount', hue='saison')
         ax.bar_label(ax.containers[0])
         ax.bar_label(ax.containers[1])
+        ax.set(title=f'Auswertung {date.today()}')
 
         _res = sns.lineplot(data=data_total, x='date', y='amount', hue='saison', style='type')
         plt.xticks(rotation=45)
