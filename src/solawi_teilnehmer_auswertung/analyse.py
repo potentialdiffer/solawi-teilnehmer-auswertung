@@ -26,17 +26,22 @@ class DataEvaluation:
     in_mitglieder_file = ""
     output_file = ""
     teilnehmer: List[Teilnehmer] = None
-    stichtag: date = None
-    far_date: date = date(year=2050, month=1, day=1)
+    stichtag: date
+    const_stichtag: date
+    far_date: date
+    today: date
+    date_sommer: date
+    date_winter: date
 
 
-    def __init__(self, in_abteilungen_file, in_mitglieder_file, out_path, stichtag):
+    def __init__(self, in_abteilungen_file: str, in_mitglieder_file: str, out_path: str, stichtag: str):
 
         # define input and output file names
         self.in_abteilungen_file = in_abteilungen_file
         self.in_mitglieder_file = in_mitglieder_file
         self.output_file = out_path
         self.stichtag = parse(stichtag).date()
+        self.const_stichtag = self.stichtag
 
         logger.info(f"Teilnehmer Auswertung für Stichtag: {self.stichtag}")
 
@@ -44,8 +49,12 @@ class DataEvaluation:
         self.parse_data()
 
     
-    def set_stichtag(self, stichtag):
+    def set_stichtag(self, stichtag: str):
         self.stichtag = parse(stichtag).date()
+
+
+    def set_stichtag_date(self, stichtag: date):
+        self.stichtag = stichtag
 
 
     def write_mailing_lists_to_file(self):
@@ -112,9 +121,10 @@ class DataEvaluation:
             logger.error(f"{e}")
             exit(1)
 
-        today = date.today()
-        date_sommer = self.get_date_summer(self.stichtag)
-        date_winter = self.get_date_winter(self.stichtag)
+        self.today = date.today()
+        self.far_date = date(year=self.today.year + 30, month=1, day=1)
+        self.date_sommer = self.get_date_summer(self.stichtag)
+        self.date_winter = self.get_date_winter(self.stichtag)
 
         t_abteilungen = table_abteilungen.filter(items=
             ['Mitglieds-Nr',
@@ -228,13 +238,18 @@ class DataEvaluation:
 
     def get_date_summer(self, today: date) -> date:
         # Sommer Start: 01. Mai
-        year = today.year if (today.month < date(year=2020, month=5, day=1).month) else today.year + 1
+        _date = date(year=2020, month=5, day=1)
+
+        year = today.year if (
+            today.month <= _date.month and today.day == _date.day) else today.year + 1
         return date(year=year, month=5, day=1)
 
 
     def get_date_winter(self, today: date) -> date:
         # Sommer Start: 01. November
-        year = today.year if (today.month < date(year=2020, month=11, day=1).month) else today.year + 1
+        _date = date(year=2020, month=11, day=1)
+
+        year = today.year if (today.month <= _date.month and today.day == _date.day) else today.year + 1
         return date(year=year, month=11, day=1)
 
 
@@ -244,13 +259,16 @@ class DataEvaluation:
             f.write('# Aktuelle Solawi Teilnehmer und Anteile\n\n')
             f.write('__Diese Datei wird automatisch erstellt. Alle Angaben momentan ohne Gewähr!__\n\n')
             f.write(f'Stichtag: {self.stichtag}\n\n')
-            f.write('| Bezeichnung | Teilnehmer | Anteile | \n')
+            f.write('| Bezeichnung | Stichtag | Teilnehmer | Anteile | \n')
             f.write('| --- | --- | --- | \n')
-            f.write(('| Sommer | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.SOMMER)))
-            f.write(('| Winter | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.WINTER)))
-            f.write(('| Eier | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.EIER)))
-            f.write(('| Käse | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.KASE)))
-            f.write(('| Brot | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.BROT)))
+            self.set_stichtag_date(self.date_sommer)
+            f.write((f'| Sommer | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.SOMMER)))
+            self.set_stichtag_date(self.date_winter)
+            f.write((f'| Winter | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.WINTER)))
+            self.set_stichtag_date(self.const_stichtag)
+            f.write((f'| Eier | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.EIER)))
+            f.write((f'| Käse | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.KASE)))
+            f.write((f'| Brot | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.BROT)))
             f.write(('\n'))
             f.write('## Aktualisieren der aktuellen Teilnehmerdaten\n\n')
             f.write(('Die Tabelle mit den Teilnehmerzahlen und den Anteilen wird in etwa jede Stunde von der Datei `.s-verein-export.csv` erstellt. Sie kann nicht manuell erstellt werden. Die `csv` Datei ist ein Export der S-Verein Liste *Gesamt-Skript*.\n'))

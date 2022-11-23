@@ -15,10 +15,8 @@
                 "abteilungen.csv",
                 "teilnehmer.csv",
                 "output.md",
-                "2022-11-01"
-                "--plot",
-                "2019",
-                "2023"
+                "2022-11-01",
+                "-vv"
             ],
         },
         {
