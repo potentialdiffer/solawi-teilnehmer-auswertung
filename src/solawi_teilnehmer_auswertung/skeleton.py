@@ -92,8 +92,8 @@ def parse_args(args):
         help='Datum, zu welchem der Bericht erzeugt werden soll im Format: yyyy-mm-dd')
 
     parser.add_argument('--plot',
-        action='store_true',
-        help='Option, um die Ernteanteile über die Zeit zu plotten [true, false]')
+        nargs=2,
+        help='Option, um die Ernteanteile über die Zeit zu plotten')
 
 
     return parser.parse_args(args)
@@ -124,12 +124,25 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
     _logger.debug("Starting Teilnehmeranalyse...")
+
+    start_year: int
+    end_year: int
+    plot = False
+    if len(args.plot) == 2:
+        start_year = int(args.plot[0])
+        end_year = int(args.plot[1])
+        plot = True
+        _logger.info(f'Plotting from {start_year} to {end_year}')
+
+
     start_teilnehmer_analyse(
         args.abteilungen_path,
         args.teilnehmer_path,
         args.bericht_path,
         args.stichtag,
-        args.plot,
+        plot,
+        start_year,
+        end_year,
     )
     _logger.info("Script ends here")
 

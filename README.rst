@@ -59,11 +59,11 @@ Usage
     - `output-markdown-path`: Name der output Datei. Sie ist mit Markdown formatiert. Kann z.b. README.md oder HEADER.md heißen, dann wird sie direkt in Nextcloud gerendert.
 
 ```
-$ python teilnehmer-analyse.py <abteilungen.csv> <mitglieder.csv> <output-bericht-path> <stichtag [dd-mm-yyyy]> <--plot>
+$ python teilnehmer-analyse.py <abteilungen.csv> <mitglieder.csv> <output-bericht-path> <stichtag [dd-mm-yyyy]> <--plot start_year end_year>
 ```
 
 - `stichtag`: ist das Datum zu welchem Zeitpunkt die Teilnehmerzahl bestimmt werden soll.
-- **legacy** `plot`: erzeugt Graphen mit den Teilnehmerzahlen üer die vergangenen Jahre. Kann im Code weiter Konfiguriert werden.
+- `--plot start_year end_year`: erzeugt Graphen mit den Teilnehmerzahlen im angegebenen Jahreszeitraum.
 
 TODO
 ====

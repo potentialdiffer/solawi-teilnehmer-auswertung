@@ -16,7 +16,7 @@ import seaborn as sns
 from solawi_teilnehmer_auswertung.teilnehmer import Teilnehmer, MembershipType
 
 
-logger = getLogger("topic_cluster")
+logger = getLogger("solawi_teilnehmer_auswertung")
 
 
 class DataEvaluation:
@@ -436,6 +436,8 @@ def main(
     out_bericht_path: str,
     stichtag: str,
     plot: bool = False,
+    start_year: int = 2018,
+    end_year: int = 2023,
     ) -> None:
 
     logger.debug(
@@ -451,18 +453,10 @@ def main(
     d.write_mailing_lists_to_file()
 
     if plot:
-        dates = ['2018-05-01',
-                '2018-11-01',
-                '2019-05-01',
-                '2019-11-01',
-                '2020-05-01',
-                '2020-11-01',
-                '2021-05-01',
-                '2021-11-01',
-                '2022-05-01',
-                '2022-11-01',
-                '2023-05-01',
-                '2023-11-01']
+        dates = []
+        for y in range(start_year, end_year+1):
+            dates.append(str(date(year=y, month=5, day=1))[:10])
+            dates.append(str(date(year=y, month=11, day=1))[:10])
 
         d.plot_analysis(dates)
 
@@ -475,5 +469,14 @@ if __name__ == "__main__":
     in_mitglieder_file = "teilnehmer.csv"
     in_abteilungen_file = "abteilungen.csv"
     stichtag = "2022-11-01"
-    main(in_abteilungen_file, in_mitglieder_file, out_file, stichtag, plot=True)
+    plot_dates = ['2019', '2023']
+
+    main(
+        in_abteilungen_file,
+        in_mitglieder_file,
+        out_file,
+        stichtag,
+        plot=True,
+        start_year=int(plot_dates[0]),
+        end_year=int(plot_dates[1]))
     logger.info("Exit with Success!")

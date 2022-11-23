@@ -10,7 +10,7 @@ import numpy as np
 from logging import DEBUG, getLogger, StreamHandler
 
 
-logger = getLogger("topic_cluster")
+logger = getLogger("solawi_teilnehmer_auswertung")
 
 class MembershipType(Enum):
     SOMMER = 'Sommer'
