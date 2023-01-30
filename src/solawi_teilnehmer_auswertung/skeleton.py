@@ -125,14 +125,18 @@ def main(args):
     setup_logging(args.loglevel)
     _logger.debug("Starting Teilnehmeranalyse...")
 
-    start_year: int
-    end_year: int
+    start_year: int = 0
+    end_year: int = 0
     plot = False
-    if len(args.plot) == 2:
-        start_year = int(args.plot[0])
-        end_year = int(args.plot[1])
-        plot = True
-        _logger.info(f'Plotting from {start_year} to {end_year}')
+    if args.plot is not None:
+        if len(args.plot) == 2:
+            start_year = int(args.plot[0])
+            end_year = int(args.plot[1])
+            plot = True
+            _logger.info(f'Plotting from {start_year} to {end_year}')
+        else:
+            _logger.error("Missing start and end year paramter for plotting")
+            exit(0)
 
 
     start_teilnehmer_analyse(

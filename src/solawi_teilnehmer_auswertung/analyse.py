@@ -236,21 +236,24 @@ class DataEvaluation:
         return months
 
 
-    def get_date_summer(self, today: date) -> date:
+    def get_date_summer(self, stichtag: date) -> date:
         # Sommer Start: 01. Mai
         _date = date(year=2020, month=5, day=1)
 
-        year = today.year if (
-            today.month <= _date.month and today.day == _date.day) else today.year + 1
-        return date(year=year, month=5, day=1)
+        year = stichtag.year if (
+            stichtag.month <= _date.month and stichtag.day == _date.day) else stichtag.year + 1
+
+        date_summer = date(year=year, month=5, day=1)
+        return stichtag if 5 <= stichtag.month and stichtag.month < 11 else date_summer
 
 
-    def get_date_winter(self, today: date) -> date:
+    def get_date_winter(self, stichtag: date) -> date:
         # Sommer Start: 01. November
         _date = date(year=2020, month=11, day=1)
 
-        year = today.year if (today.month <= _date.month and today.day == _date.day) else today.year + 1
-        return date(year=year, month=11, day=1)
+        year = stichtag.year if (stichtag.month <= _date.month and stichtag.day == _date.day) else stichtag.year + 1
+        date_winter = date(year=year, month=11, day=1)
+        return stichtag if 11 <= stichtag.month or stichtag.month < 5 else date_winter
 
 
     def write_amout_data_to_file(self, output_file: str) -> None:
