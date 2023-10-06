@@ -14,6 +14,7 @@ import seaborn as sns
 
 
 from solawi_teilnehmer_auswertung.teilnehmer import Teilnehmer, MembershipType
+from solawi_teilnehmer_auswertung.location import TeilnehmerLocation
 
 
 logger = getLogger("solawi_teilnehmer_auswertung")
@@ -125,6 +126,8 @@ class DataEvaluation:
         self.far_date = date(year=self.today.year + 30, month=1, day=1)
         self.date_sommer = self.get_date_summer(self.stichtag)
         self.date_winter = self.get_date_winter(self.stichtag)
+        logger.info(f"Beginn nächster Sommer: {self.date_sommer}")
+        logger.info(f"Beginn nächster Winte: {self.date_winter}")
 
         t_abteilungen = table_abteilungen.filter(items=
             ['Mitglieds-Nr',
@@ -272,27 +275,70 @@ class DataEvaluation:
             f.write((f'| Eier | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.EIER)))
             f.write((f'| Käse | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.KASE)))
             f.write((f'| Brot | {str(self.stichtag)} | %i | %.1f | \n') % (self.get_amount_of_membership(MembershipType.BROT)))
-            f.write(('\n'))
+            f.write(('\n\n'))
+
+            f.write(('## Teilnehmer nach Ort\n\n'))
+
+            f.write(('### Sommer Gemüse\n\n'))
+            f.write('| Ort | Anteile | \n')
+            f.write('| --- | --- | \n')
+
+            f.write(('### Eier\n\n'))
+            f.write('| Ort | Anteile | \n')
+            f.write('| --- | --- | \n')
+
+            ## TODO fix this function calls. need to iterate over all postal codes. or retrieve automatically
+            # f.write(f'| %s | %i | \n', self.get_amount_of_postal_code(
+            #     'asd'), self.get_amount_of_postal_code('asd'))
+
             f.write('## Aktualisieren der aktuellen Teilnehmerdaten\n\n')
             f.write(('Die Tabelle mit den Teilnehmerzahlen und den Anteilen wird in etwa jede Stunde von der Datei `.s-verein-export.csv` erstellt. Sie kann nicht manuell erstellt werden. Die `csv` Datei ist ein Export der S-Verein Liste *Gesamt-Skript*.\n'))
             f.write(('Um die Daten zu aktualisieren muss:\n\n1. Ein Export der Liste in S-Verein erstellt werden\n2. Die Liste muss in `.s-verein-export.csv` umbenannt werden\n3. Die umbenannte Liste muss in diesen Ordner geladen werden\n\n'))
 
 
-    def get_amount_of_membership(self, mt: MembershipType) -> Tuple[int, float]:
+    def print_amout_per_location(self) -> None:
+        codes = self.get_postal_codes()
+        locator = TeilnehmerLocation()
+        locations = locator.get_locations(codes)
+        logger.debug("postal codes %s", codes)
+        logger.debug("locations %s", locations)
+
+        print("##### Eier #####")
+        for location in locations:
+            teilnehmer, amount = self.get_amount_of_membership(
+                MembershipType.EIER, [], [location])
+            print(f'[{location}] {amount}')
+            
+
+
+    def get_amount_of_membership(self, mt: MembershipType, postal_codes: List[int] = [], locations: List[str] = []) -> Tuple[int, float]:
         """
         for type t on date d
         """
-
         teilnehmer = 0
         amount = 0.0
         for member in self.teilnehmer_data:
-            for membership in member.memberships:
-                if membership.membership_type == mt:
-                    if membership.start <= self.stichtag and self.stichtag < membership.end:
-                        amount = amount + membership.amount
-                        teilnehmer = teilnehmer + 1
+            if (not postal_codes and not locations) or (member.postal_code in postal_codes or member.location in locations):
+                for membership in member.memberships:
+                    if membership.membership_type == mt:
+                        if membership.start <= self.stichtag and self.stichtag < membership.end:
+                            amount_old = amount
+                            amount = amount + membership.amount
+                            teilnehmer = teilnehmer + 1
+                            if amount != amount:
+                                logger.error(
+                                    f"amount={amount},amount_old={amount_old}, membership.amount={membership.amount} At member:\n{member}")
 
         return (teilnehmer, amount)
+
+
+    def get_postal_codes(self) -> List[int]:
+        postal_codes: List[int] = []
+        for member in self.teilnehmer_data:
+            if member.postal_code not in postal_codes:
+                postal_codes.append(member.postal_code)
+
+        return postal_codes
 
 
     def get_mails_of_memberships(self, mt: List[MembershipType], sorted=False) -> List[str]:
@@ -472,6 +518,7 @@ def main(
 
     d.write_amout_data_to_file(out_bericht_path)
     d.write_mailing_lists_to_file()
+    d.print_amout_per_location()
 
     if plot:
         dates = []

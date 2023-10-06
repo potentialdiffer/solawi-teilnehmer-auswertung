@@ -9,8 +9,11 @@ from pandas import DataFrame as df
 import numpy as np
 from logging import DEBUG, getLogger, StreamHandler
 
+from solawi_teilnehmer_auswertung.location import TeilnehmerLocation
 
 logger = getLogger("solawi_teilnehmer_auswertung")
+
+locator = TeilnehmerLocation()
 
 class MembershipType(Enum):
     SOMMER = 'Sommer'
@@ -39,18 +42,22 @@ class Teilnehmer:
     mails: List[str] = None
     memberships: List[Membership] = None
     postal_code: int = None
+    location: str = None
 
 
     def __post_init__(self) -> None:
         self.memberships = list()
+        self.location = locator.get_location(self.postal_code)
 
 
     def add_memberships(self, abteilungen: df) -> None:
         for idx in abteilungen.index:
             if self.id == abteilungen['Mitglieds-Nr'][idx]:
+                if abteilungen['Beitragsbezeichnung'][idx] != abteilungen['Beitragsbezeichnung'][idx]:
+                    continue
                 self.add_membership(
                     abteilungen['Abteilungsbezeichnung'][idx],
-                    abteilungen['Abteilungseintritt'][idx],
+                    parse(abteilungen['Abteilungseintritt'][idx]).date(),
                     self.get_earlier_date(
                         abteilungen['Beitragsaustritt'][idx], 
                         abteilungen['Abteilungsaustritt'][idx]),
@@ -63,7 +70,7 @@ class Teilnehmer:
 
     def add_membership(self, membership_type: MembershipType, start: date, end: date, amount: int) -> None:
         self.memberships.append(
-            Membership(MembershipType(membership_type), parse(start).date(), end, amount)
+            Membership(MembershipType(membership_type), start, end, amount)
         )
 
 

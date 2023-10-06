@@ -93,7 +93,7 @@ def parse_args(args):
 
     parser.add_argument('--plot',
         nargs=2,
-        help='Option, um die Ernteanteile über die Zeit zu plotten')
+        help='Option, um die Ernteanteile über die Zeit zu plotten: yyyy yyyy')
 
 
     return parser.parse_args(args)
