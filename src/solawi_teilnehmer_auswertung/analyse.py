@@ -3,6 +3,7 @@ import os
 import re
 from logging import DEBUG, getLogger, StreamHandler
 import pandas as pd
+import operator
 import numpy as np
 from datetime import date
 from datetime import datetime
@@ -82,13 +83,13 @@ class DataEvaluation:
         mail_left = self.get_left_solawis()
         mail_left = self.clean_left_list(mail_left, mails_all)
 
-        self.write_mail_to_file(mails_all, '/mails_all.txt', today_str)
-        self.write_mail_to_file(mail_left, '/ausgetretene_mitglieder.txt', today_str)
-        self.write_mail_to_file(mails_winter, '/winter-mail.txt', today_str)
-        self.write_mail_to_file(mails_sommer, '/sommer-mail.txt', today_str)
-        self.write_mail_to_file(mails_eier, '/eier-mail.txt', today_str)
-        self.write_mail_to_file(mails_kase, '/kase-mail.txt', today_str)
-        self.write_mail_to_file(mails_brot, '/brot-mail.txt', today_str)
+        self.write_mail_to_file(mails_all, '/mails_all.csv', today_str)
+        self.write_mail_to_file(mail_left, '/ausgetretene_mitglieder.csv', today_str)
+        self.write_mail_to_file(mails_winter, '/winter-mail.csv', today_str)
+        self.write_mail_to_file(mails_sommer, '/sommer-mail.csv', today_str)
+        self.write_mail_to_file(mails_eier, '/eier-mail.csv', today_str)
+        self.write_mail_to_file(mails_kase, '/kase-mail.csv', today_str)
+        self.write_mail_to_file(mails_brot, '/brot-mail.csv', today_str)
 
 
     def parse_data(self) -> None:
@@ -195,7 +196,7 @@ class DataEvaluation:
             t = Teilnehmer(
                 id=t_mitglieder['Mitglieds-Nr'][idx],
                 name=t_mitglieder['Vorname'][idx] + ' ' + t_mitglieder['Nachname'][idx],
-                postal_code=t_mitglieder['PLZ'][idx]
+                # postal_code=t_mitglieder['PLZ'][idx]
             )
             t.add_memberships(t_abteilungen)
             t.add_mails(mails)
@@ -203,17 +204,38 @@ class DataEvaluation:
             self.teilnehmer_data.append(t)
 
 
-    def write_mail_to_file(self, mails, file_name, today_str):
+    def write_mail_to_file(self, member_mails: List[dict], file_name, today_str):
+        '''
+        member_mails containes member name and List of mails 
+        member_mails = {name, mails[]}
+        '''
+
+        special_char_map = {ord('ä'): 'ae', ord('ü'): 'ue',
+                            ord('ö'): 'oe', ord('ß'): 'ss',
+                            ord('ç'): 'c', ord('á'): 'a'}
+
         file = open(today_str + file_name, 'w')
         i = 0
-        for mail in mails:
+        for member_mail in member_mails:
             i = i + 1
             try:
-                emails = re.findall(r"[a-zA-Z0-9\.\-+_]+@[a-zA-Z0-9\.\-+_]+\.[a-zA-Z]+", mail)
+                if len(member_mail['mails']) == 0:
+                    logger.info(f"member {i} {member_mail['name']} who probably has no mail adress")
+                    continue
+
+                emails: List[str] = list()
+                for m in member_mail["mails"]:
+                    emails.extend(re.findall(
+                        r"[a-zA-Z0-9\.\-+_]+@[a-zA-Z0-9\.\-+_]+\.[a-zA-Z]+", m))
+                    
                 for m in emails:
-                    file.writelines(m.lower() + '\n')
+                    name = member_mail["name"].translate(special_char_map)
+                    date_str = member_mail["date"]
+                    file.writelines('"' + date_str + '"; "' + name + '"; ' + m.lower() + ';\n')
+
             except Exception as e:
-                logger.error(f"Exception {e} occured on member {i} who probably has no mail adress: {mail}")
+                logger.error(
+                    f"Exception {e} occured on member {i} {member_mail['name']} who probably has no mail adress: {member_mail['mails']}")
         file.close()
 
 
@@ -341,53 +363,63 @@ class DataEvaluation:
         return postal_codes
 
 
-    def get_mails_of_memberships(self, mt: List[MembershipType], sorted=False) -> List[str]:
+    def get_mails_of_memberships(self, mt: List[MembershipType], sorted=True) -> List[dict]:
 
-        mails = list()
+        mails: List[dict] = list()
         for member in self.teilnehmer_data:
             for membership in member.memberships:
                 if membership.membership_type in mt:
                     if membership.start <= self.stichtag and self.stichtag < membership.end:
                         if member.mails is not None :
-                            mails.extend(member.mails)
+                            mails.append({"name": member.name, 
+                                           "mails": member.mails,
+                                           "date": membership.start.strftime("%Y-%m-%d")})
                         break
         if sorted:
-            mails.sort()
+            mails.sort(key=operator.itemgetter("date"))
+
         return mails
 
 
-    def get_left_solawis(self, sorted=False) -> List[str]:
+    def get_left_solawis(self, sorted=False) -> List[dict]:
 
         mails = list()
         for member in self.teilnehmer_data:
             left = False
+            left_date: str = "none"
             for membership in member.memberships:
                 if membership.end <= self.stichtag:
                     left = True
+                    left_date = membership.end.strftime("%Y-%m-%d")
                 else:
                     left = False
 
             if left and member.mails is not None:
-                mails.extend(member.mails)
+                mails.append({
+                    "date": left_date,
+                    "name": member.name, 
+                    "mails": member.mails})
 
         if sorted:
-            mails.sort()
+            mails.sort(key=operator.itemgetter("name"))
         return mails
 
 
-    def clean_left_list(self, left: List[str], right: List[str], sorted=False) -> List[str]:
+    def clean_left_list(self, left: List[dict], right: List[dict], sorted=True) -> List[dict]:
         """
         merge right list in left list
         """
 
-        new_left = list()
+        new_left: List[dict] = list()
 
+
+        right_name_map = map(operator.itemgetter('name'), right)
         for l in left:
-            if l not in right:
+            if l["name"] not in right_name_map:
                 new_left.append(l)
 
         if sorted:
-            new_left.sort()
+            new_left.sort(key=operator.itemgetter("date"))
 
         return new_left
 
